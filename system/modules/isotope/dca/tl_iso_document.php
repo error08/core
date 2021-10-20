@@ -107,7 +107,7 @@ $GLOBALS['TL_DCA']['tl_iso_document'] = array
     (
         '__selector__'              => array('type'),
         'default'                   => '{type_legend},name,type',
-        'standard'                  => '{type_legend},name,type;{config_legend},documentTitle,fileTitle;{template_legend},documentTpl,gallery,collectionTpl,orderCollectionBy',
+        'standard'                  => '{type_legend},name,type;{config_legend},documentTitle,fileTitle;{template_legend},documentTpl,documentBgImage,gallery,collectionTpl,orderCollectionBy',
     ),
 
     // Fields
@@ -168,6 +168,14 @@ $GLOBALS['TL_DCA']['tl_iso_document'] = array
             },
             'eval'                  => array('includeBlankOption'=>true, 'chosen'=>true, 'tl_class'=>'w50', 'mandatory'=>true),
             'sql'                   => "varchar(64) NOT NULL default ''",
+        ),
+        'documentBgImage' => array
+        (
+            'label'                 => &$GLOBALS['TL_LANG']['tl_iso_document']['documentBgImage'],
+            'exclude'               => true,
+            'inputType'             => 'fileTree',
+            'eval'                  => ['fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true, 'tl_class'=>'clr', 'extensions'=>\Contao\Config::get('validImageTypes')],
+            'sql'                   => 'blob NULL'
         ),
         'collectionTpl'  => array
         (

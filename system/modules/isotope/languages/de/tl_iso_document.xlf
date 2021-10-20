@@ -49,6 +49,14 @@
         <source>Choose a template you want to render this document with.</source>
         <target>Wählen Sie ein Template aus, mit dem Sie das Dokument rendern möchten.</target>
       </trans-unit>
+      <trans-unit id="tl_iso_document.documentBgImage.0">
+        <source>Document background image</source>
+        <target>Hintergrundbild des Dokumentes</target>
+      </trans-unit>
+      <trans-unit id="tl_iso_document.documentBgImage.1">
+        <source>Choose a image you want to render in the background of this document.</source>
+        <target>Wählen Sie ein Bild aus, welches in den Hintergrund des Dokumentes rendern möchten.</target>
+      </trans-unit>
       <trans-unit id="tl_iso_document.gallery.0">
         <source>Gallery</source>
         <target>Galerie</target>

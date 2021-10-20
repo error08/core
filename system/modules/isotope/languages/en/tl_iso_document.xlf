@@ -38,6 +38,12 @@
       <trans-unit id="tl_iso_document.documentTpl.1">
         <source>Choose a template you want to render this document with.</source>
       </trans-unit>
+      <trans-unit id="tl_iso_document.documentBgImage.0">
+          <source>Document background image</source>
+        </trans-unit>
+        <trans-unit id="tl_iso_document.documentBgImage.1">
+          <source>Choose a image you want to render in the background of this document.</source>
+        </trans-unit>
       <trans-unit id="tl_iso_document.gallery.0">
         <source>Gallery</source>
       </trans-unit>

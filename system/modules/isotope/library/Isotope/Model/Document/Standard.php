@@ -57,6 +57,7 @@ class Standard extends Document implements IsotopeDocument
         return $strFile;
     }
 
+
     /**
      * Generate the pdf document
      *
@@ -68,11 +69,11 @@ class Standard extends Document implements IsotopeDocument
     protected function generatePDF(IsotopeProductCollection $objCollection, array $arrTokens)
     {
         // TCPDF configuration
-        $l                    = array();
-        $l['a_meta_dir']      = 'ltr';
-        $l['a_meta_charset']  = $GLOBALS['TL_CONFIG']['characterSet'];
+        $l = array();
+        $l['a_meta_dir'] = 'ltr';
+        $l['a_meta_charset'] = $GLOBALS['TL_CONFIG']['characterSet'];
         $l['a_meta_language'] = substr($GLOBALS['TL_LANGUAGE'], 0, 2);
-        $l['w_page']          = 'page';
+        $l['w_page'] = 'page';
 
         // Include TCPDF config
         define('K_TCPDF_EXTERNAL_CONFIG', true);
@@ -108,13 +109,42 @@ class Standard extends Document implements IsotopeDocument
         define('HEAD_MAGNIFICATION', 1.1);
         define('K_CELL_HEIGHT_RATIO', 1.25);
         define('K_TITLE_MAGNIFICATION', 1.3);
-        define('K_SMALL_RATIO', 2/3);
+        define('K_SMALL_RATIO', 2 / 3);
         define('K_THAI_TOPCHARS', false);
         define('K_TCPDF_CALLS_IN_HTML', false);
 
         // Create new PDF document
-        $pdf = new \TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true);
-
+        $pdf = new class(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false) extends \TCPDF {
+            public function __construct($orientation='P', $unit='mm', $format='A4', $unicode=true, $encoding='UTF-8', $diskcache=false, $pdfa=false) {
+                \System::log('create anon class',__METHOD__, TL_GENERAL);
+                parent::__construct($orientation, $unit, $format, $unicode, $encoding, $diskcache, $pdfa);
+            }
+            //Page header
+            public function Header() {
+                \System::log('run header function ', __METHOD__, TL_GENERAL);
+                // Set background image if available
+                $objFile = \FilesModel::findByUuid($this->documentBgImage);
+                if (isset($objFile->path) && $objFile->path != null) {
+                    \System::log('Path to background image: '.$objFile->path, __METHOD__, TL_GENERAL);
+                    // get the current page break margin
+                    $bMargin = $this->getBreakMargin();
+                    // get current auto-page-break mode
+                    $auto_page_break = $this->AutoPageBreak;
+                    // disable auto-page-break
+                    $this->SetAutoPageBreak(false, 0);
+                    // set background image
+                    $img_file = $objFile->path;
+                    $this->Image($img_file, 0, 0, 210, 297, '', '', '', false, 300, '', false, false, 0);
+                    // restore auto-page-break status
+                    $this->SetAutoPageBreak($auto_page_break, $bMargin);
+                    // set the starting point for the page content
+                    $this->setPageMark();
+                } else {
+                    \System::log('run header else case', __METHOD__, TL_GENERAL);
+                    parent::Header();
+                }
+            }
+        };
         // Set document information
         $pdf->SetCreator(PDF_CREATOR);
         $pdf->SetAuthor(PDF_AUTHOR);
