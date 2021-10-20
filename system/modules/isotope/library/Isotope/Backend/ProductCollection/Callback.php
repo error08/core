@@ -432,6 +432,41 @@ class Callback extends \Backend
         return '<p class="tl_gerror">' . $GLOBALS['TL_LANG']['MSC']['backendShippingNotFound'] . '</p>';
     }
 
+    /**
+     * Manage act=select buttons
+     *
+     * @param array $arrButtons
+     *
+     * @return array
+     */
+    public function forSelect($arrButtons){
+        if (\Input::get('act') == 'select' && \Input::post('printDocument'))
+        {
+            $orders = Order::findMultipleByIds($_POST['IDS']);
+            $i = 0;
+            foreach ($orders as $order) {
+                $arrCollection[$i] = $order;
+                $i++;
+            }
+
+            // Set the language of the logged in user
+            \System::loadLanguageFile('default', System::getContainer()->get('request_stack')->getCurrentRequest()->getLocale(), true);
+
+            $objDocument = Document::findByPk(\Input::post('printDocument'));
+            $objDocument->outputDocumentsToBrowser($arrCollection);
+        }else{
+            unset($arrButtons['copy']);
+            unset($arrButtons['cut']);
+
+            $documents = Document::findAll();
+            foreach ($documents as $document) {
+                array_insert($arrButtons, 2, array($document->name=>'<button type="submit" name="printDocument" id="'.$document->name.'" class="tl_submit" value="'.$document->id.'">'.$document->name.'(en) drucken</>'));
+            }
+
+            $result = $arrButtons;
+        }
+        return $result;
+    }
 
     /**
      * Pass an order to the document

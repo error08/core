@@ -29,13 +29,31 @@ class Standard extends Document implements IsotopeDocument
     {
         $this->prepareEnvironment($objCollection);
 
-        $arrTokens  = $this->prepareCollectionTokens($objCollection);
-        $pdf        = $this->generatePDF($objCollection, $arrTokens);
+        $arrTokens[0]  		= $this->prepareCollectionTokens($objCollection);
+        $arrCollection[0] 	= $objCollection;
+        $pdf        = $this->generatePDF($arrCollection, $arrTokens, \StringUtil::parseSimpleTokens($this->documentTitle, $arrTokens));
 
         $pdf->Output(
             $this->prepareFileName($this->fileTitle, $arrTokens) . '.pdf',
             'D'
         );
+    }
+
+    /**
+     * Print more documents to one pdf file
+     */
+    public function outputDocumentsToBrowser(array $arrCollection)
+    {
+        if($arrCollection > 0){
+            $this->prepareEnvironment($arrCollection[0]);
+            $size = sizeof($arrCollection);
+            for ($i = 0;$i < $size;$i++){
+                $arrTokens[$i]  = $this->prepareCollectionTokens($arrCollection[$i]);
+            }
+            $pdf = $this->generatePDF($arrCollection, $arrTokens, 'document_export');
+
+            $pdf->Output("Export" . '.pdf','D');
+        }
     }
 
     /**
@@ -46,7 +64,7 @@ class Standard extends Document implements IsotopeDocument
         $this->prepareEnvironment($objCollection);
 
         $arrTokens  = $this->prepareCollectionTokens($objCollection);
-        $pdf        = $this->generatePDF($objCollection, $arrTokens);
+        $pdf        = $this->generatePDF($objCollection, $arrTokens, \StringUtil::parseSimpleTokens($this->documentTitle, $arrTokens));
         $strFile    = $this->prepareFileName($this->fileTitle, $arrTokens, $strDirectoryPath) . '.pdf';
 
         $pdf->Output(
@@ -65,7 +83,7 @@ class Standard extends Document implements IsotopeDocument
      *
      * @return \TCPDF
      */
-    protected function generatePDF(IsotopeProductCollection $objCollection, array $arrTokens)
+    protected function generatePDF(array $arrCollection, array $arrTokens, $docTitle)
     {
         // TCPDF configuration
         $l                    = array();
@@ -118,7 +136,7 @@ class Standard extends Document implements IsotopeDocument
         // Set document information
         $pdf->SetCreator(PDF_CREATOR);
         $pdf->SetAuthor(PDF_AUTHOR);
-        $pdf->SetTitle(\StringUtil::parseSimpleTokens($this->documentTitle, $arrTokens));
+        $pdf->SetTitle($docTitle);
 
         // Prevent font subsetting (huge speed improvement)
         $pdf->setFontSubsetting(false);
@@ -139,14 +157,15 @@ class Standard extends Document implements IsotopeDocument
         // Set some language-dependent strings
         $pdf->setLanguageArray($l);
 
-        // Initialize document and add a page
-        $pdf->AddPage();
-
-        // Set font
-        $pdf->SetFont(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN);
-
-        // Write the HTML content
-        $pdf->writeHTML($this->generateTemplate($objCollection, $arrTokens), true, 0, true, 0);
+        $size = sizeof($arrCollection);
+        for ($i = 0;$i < $size ;$i++){
+            // Initialize document and add a page
+            $pdf->AddPage();
+            // Set font
+            $pdf->SetFont(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN);
+            // Write the HTML content
+            $pdf->writeHTML($this->generateTemplate($arrCollection[$i], $arrTokens[$i]), true, 0, true, 0);
+        }
 
         $pdf->lastPage();
 

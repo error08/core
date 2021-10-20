@@ -51,6 +51,15 @@ $GLOBALS['TL_DCA']['tl_iso_product_collection'] = array
         ),
     ),
 
+    // Select
+    'select' => array
+    (
+        'buttons_callback' => array
+        (
+            array('Isotope\Backend\ProductCollection\Callback', 'forSelect'),
+        ),
+    ),
+
     // List
     'list' => array
     (
