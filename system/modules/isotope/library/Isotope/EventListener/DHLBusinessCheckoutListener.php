@@ -23,6 +23,7 @@ use Petschko\DHL\Receiver;
 use Petschko\DHL\Sender;
 use Petschko\DHL\SendPerson;
 use Petschko\DHL\ShipmentDetails;
+use Petschko\DHL\ShipmentOrder;
 
 class DHLBusinessCheckoutListener
 {
@@ -40,12 +41,16 @@ class DHLBusinessCheckoutListener
             return;
         }
 
+        // only compatible with version 3+
+        // see: https://github.com/error08/dhl-php-sdk
         $dhl = new BusinessShipment($this->getCredentials($shipping), (bool) $shipping->debug);
-        $dhl->setShipmentDetails($this->getShipmentDetails($shipping, $order));
-        $dhl->setSender($this->getSender($config->getOwnerAddress()));
-        $dhl->setReceiver($this->getReceiver($shippingAddress));
-        $dhl->setReceiverEmail($shippingAddress->email);
+        $shipmentOrder = new ShipmentOrder();
+        $shipmentOrder->setShipmentDetails($this->getShipmentDetails($shipping, $order));
+        $shipmentOrder->setSender($this->getSender($config->getOwnerAddress()));
+        $shipmentOrder->setReceiver($this->getReceiver($shippingAddress));
+        $shipmentOrder->getShipmentDetails()->setNotificationEmail($shippingAddress->email);
 
+        $dhl->addShipmentOrder($shipmentOrder);
         $response = $dhl->createShipment();
 
         if ($shipping->logging) {
@@ -62,7 +67,17 @@ class DHLBusinessCheckoutListener
         }
 
         $data = deserialize($order->shipping_data, true);
+
+        $xml = preg_replace("/(<\/?)([a-zA-Z0-9_-]+):([^>]*>)/", "$1$3", $soap);
+        $xml = simplexml_load_string($xml);
+        $json = json_encode($xml);
+
+        $data['dhl_shipment_order'] =  $json;
         $data['dhl_shipment_number'] = $response->getShipmentNumber();
+        $data['dhl_shipment_label'] = $response->getLabel();
+        $data['dhl_shipment_statusCode'] = $response->getStatusCode();
+        $data['dhl_shipment_statusText'] = $response->getStatusText();
+        $data['dhl_shipment_statusMessage'] = $response->getStatusMessage();
         $order->shipping_data = $data;
         $order->save();
 
@@ -81,7 +96,8 @@ class DHLBusinessCheckoutListener
         $credentials->setApiUser($shipping->dhl_app);
         $credentials->setApiPassword($shipping->dhl_token);
 
-        if ($shipping->logging) {
+        // No logging of prod creds
+        if ($shipping->logging && (bool) $shipping->debug) {
             log_message(print_r($credentials, true), 'isotope_dhl_business.log');
         }
 
@@ -123,7 +139,6 @@ class DHLBusinessCheckoutListener
 
         $person->setZip($address->postal);
         $person->setCity($address->city);
-//        $person->setCountry((string) 'Germany');
         $person->setCountryISOCode($address->country);
 
         $person->setEmail($address->email);
@@ -136,13 +151,14 @@ class DHLBusinessCheckoutListener
         DHLBusiness $shippingMethod,
         IsotopePurchasableCollection $order
     ) {
+        $participationNumber = "01";
         $scale = $order->addToScale();
 
         if (($shippingWeight = $shippingMethod->getWeight()) !== null) {
             $scale->add($shippingWeight);
         }
 
-        $details = new ShipmentDetails($shippingMethod->dhl_epk);
+        $details = new ShipmentDetails($shippingMethod->dhl_epk.substr($shippingMethod->dhl_product,1,2).$participationNumber);
 
         $details->setProduct($shippingMethod->dhl_product);
         $details->setCustomerReference($order->getDocumentNumber());

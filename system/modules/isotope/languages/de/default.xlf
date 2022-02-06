@@ -517,6 +517,18 @@
         <source>Transaction ID: %s</source>
         <target>Transaktions-ID: %s</target>
       </trans-unit>
+      <trans-unit id="MSC.dhlTrackingnumber">
+        <source>Tracking Number</source>
+        <target>Sendungsnummer</target>
+      </trans-unit>
+      <trans-unit id="MSC.dhlLabelOnline">
+        <source>Open generated shipping label.</source>
+        <target>Generiertes Versandlabel öffnen</target>
+      </trans-unit>
+      <trans-unit id="MSC.dhlDeleteLabel">
+        <source>Delete generated shipping label.</source>
+        <target>Generiertes Versandlabel löschen</target>
+      </trans-unit>
       <trans-unit id="MSC.paypalTransactionOnline">
         <source>You can view this PayPal transaction online.</source>
         <target>Sie können diese PayPal Transaktion online ansehen.</target>

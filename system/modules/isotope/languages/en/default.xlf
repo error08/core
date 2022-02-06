@@ -392,6 +392,15 @@
       <trans-unit id="MSC.paypalTransaction">
         <source>Transaction ID: %s</source>
       </trans-unit>
+      <trans-unit id="MSC.dhlTrackingnumber">
+        <source>Tracking Number</source>
+      </trans-unit>
+      <trans-unit id="MSC.dhlLabelOnline">
+        <source>Show generated shipping label.</source>
+      </trans-unit>
+      <trans-unit id="MSC.dhlDeleteLabel">
+        <source>Delete generated shipping label.</source>
+      </trans-unit>
       <trans-unit id="MSC.paypalTransactionOnline">
         <source>You can view this PayPal transaction online.</source>
       </trans-unit>
