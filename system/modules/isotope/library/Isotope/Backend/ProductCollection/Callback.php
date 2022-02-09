@@ -440,72 +440,39 @@ class Callback extends \Backend
      * @return array
      */
     public function forSelect($arrButtons){
-        if (\Input::get('act') == 'select' && \Input::post('printDocument'))
-        {
-            $arrSelect = array
-            (
-                'name'       => 'document',
-                'label'      => &$GLOBALS['TL_LANG']['tl_iso_product_collection']['document_choice'],
-                'inputType'  => 'select',
-                'foreignKey' => 'tl_iso_document.name',
-                'eval'       => array('mandatory' => true),
-            );
+        $strRedirectUrl = str_replace('&key=print_documents', '', \Environment::get('request'));
+        if(\Input::get('act') == 'select' && 'tl_select' === \Input::post('FORM_SUBMIT')) {
 
-            $objSelect = new \SelectMenu(\SelectMenu::getAttributesFromDca($arrSelect, $arrSelect['name']));
-
-            $strMessages = \Message::generate();
-            \Message::reset();
-
-            // Return form
-                    return '
-                <div id="tl_buttons">
-                <a href="' . ampersand($strRedirectUrl) . '" class="header_back" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['backBT']) . '">' . $GLOBALS['TL_LANG']['MSC']['backBT'] . '</a>
-                </div>
-
-                <h2 class="sub_headline">' . sprintf($GLOBALS['TL_LANG']['tl_iso_product_collection']['print_document'][1], $dc->id) . '</h2>' . $strMessages . '
-
-                <form action="' . ampersand(\Environment::get('request'), true) . '" id="tl_iso_product_import" class="tl_form" method="post">
-                <div class="tl_formbody_edit">
-                <input type="hidden" name="FORM_SUBMIT" value="tl_iso_print_document">
-                <input type="hidden" name="REQUEST_TOKEN" value="' . REQUEST_TOKEN . '">
-
-                <div class="tl_tbox block">
-                  <div class="clr widget">
-                    ' . $objSelect->parse() . '
-                    <p class="tl_help">' . $objSelect->description . '</p>
-                  </div>
-                </div>
-
-                </div>
-
-                <div class="tl_formbody_submit">
-
-                <div class="tl_submit_container">
-                <input type="submit" name="print" id="print" class="tl_submit" alt="" accesskey="s" value="' . specialchars($GLOBALS['TL_LANG']['tl_iso_product_collection']['print']) . '">
-                </div>
-
-                </div>
-                </form>';
-        } elseif(\Input::get('act') == 'select' && 'tl_iso_print_document' === \Input::post('FORM_SUBMIT')) {
+        \System::log('POST: '.print_r($_POST,1), __METHOD__, TL_GENERAL);
+            \System::log('GET: '.print_r($_GET,1), __METHOD__, TL_GENERAL);
             $orders = Order::findMultipleByIds($_POST['IDS']);
+            if (count($orders) == 0) {
+                \Message::addError('Could not find orders for ids.');
+                \Controller::redirect($strRedirectUrl);
+            }
+
+            /** @var \Isotope\Interfaces\IsotopeDocument $objDocument */
+            if (($objDocument = Document::findByPk(\Input::post('documentId'))) === null) {
+                \Message::addError('Could not find document id.');
+                \Controller::redirect($strRedirectUrl);
+            }
+            // Set the language of the logged in user
+            \System::loadLanguageFile('default', System::getContainer()->get('request_stack')->getCurrentRequest()->getLocale(), true);
+
+            $arrCollection = array();
             $i = 0;
             foreach ($orders as $order) {
                 $arrCollection[$i] = $order;
                 $i++;
             }
-
-            // Set the language of the logged in user
-            \System::loadLanguageFile('default', System::getContainer()->get('request_stack')->getCurrentRequest()->getLocale(), true);
-
-            $objDocument = Document::findByPk(\Input::post('printDocument'));
             $objDocument->outputDocumentsToBrowser($arrCollection);
+            return $arrButtons;
         } else {
             unset($arrButtons['copy']);
             unset($arrButtons['cut']);
-
             $documents = Document::findAll();
             foreach ($documents as $document) {
-                array_insert($arrButtons, 2, array($document->name=>'<button type="submit" name="printDocument" class="tl_submit">Drucken</>'));
+                array_push($arrButtons,'<input type="hidden" name="documentId" value="'.$document->id.'"/><button type="submit" name="printDocuments" value="1" class="tl_submit">'.$document->name.' drucken</>');
             }
 
             return $arrButtons;

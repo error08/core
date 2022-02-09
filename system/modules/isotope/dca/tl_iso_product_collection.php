@@ -52,6 +52,7 @@ $GLOBALS['TL_DCA']['tl_iso_product_collection'] = array
     ),
 
     // Select
+
     'select' => array
     (
         'buttons_callback' => array
