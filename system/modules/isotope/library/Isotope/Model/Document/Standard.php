@@ -31,10 +31,10 @@ class Standard extends Document implements IsotopeDocument
 
         $arrTokens[0]  		= $this->prepareCollectionTokens($objCollection);
         $arrCollection[0] 	= $objCollection;
-        $pdf = $this->generatePDF($arrCollection, $arrTokens, \StringUtil::parseSimpleTokens($this->documentTitle, $arrTokens));
+        $pdf = $this->generatePDF($arrCollection, $arrTokens, \StringUtil::parseSimpleTokens($this->documentTitle, $arrTokens[0]));
 
         $pdf->Output(
-            $this->prepareFileName($this->fileTitle, $arrTokens) . '.pdf',
+            $this->prepareFileName($this->fileTitle, $arrTokens[0]) . '.pdf',
             'D'
         );
     }
@@ -50,9 +50,10 @@ class Standard extends Document implements IsotopeDocument
             for ($i = 0;$i < $size;$i++){
                 $arrTokens[$i]  = $this->prepareCollectionTokens($arrCollection[$i]);
             }
-            $pdf = $this->generatePDF($arrCollection, $arrTokens, 'document_export');
+            $name = date("Y-m-d").'-Export-'.$size.'-documents';
+            $pdf = $this->generatePDF($arrCollection, $arrTokens, $name);
 
-            $pdf->Output("Export" . '.pdf','D');
+            $pdf->Output($name.'.pdf','D');
         }
     }
 
@@ -62,12 +63,10 @@ class Standard extends Document implements IsotopeDocument
     public function outputToFile(IsotopeProductCollection $objCollection, $strDirectoryPath)
     {
         $this->prepareEnvironment($objCollection);
-        $arrTokens = array();
         $arrTokens[0]  = $this->prepareCollectionTokens($objCollection);
-        $arrCollection = array();
         $arrCollection[0] = $objCollection;
-        $pdf        = $this->generatePDF($arrCollection, $arrTokens, \StringUtil::parseSimpleTokens($this->documentTitle, $arrTokens));
-        $strFile    = $this->prepareFileName($this->fileTitle, $arrTokens, $strDirectoryPath) . '.pdf';
+        $pdf        = $this->generatePDF($arrCollection, $arrTokens, \StringUtil::parseSimpleTokens($this->documentTitle, $arrTokens[0]));
+        $strFile    = $this->prepareFileName($this->fileTitle, $arrTokens[0], $strDirectoryPath) . '.pdf';
 
         $pdf->Output(
             $strFile,
