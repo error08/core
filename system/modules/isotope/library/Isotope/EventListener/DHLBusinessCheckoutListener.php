@@ -17,13 +17,13 @@ use Isotope\Model\Address;
 use Isotope\Model\Config;
 use Isotope\Model\ProductCollection\Order;
 use Isotope\Model\Shipping\DHLBusiness;
-use Petschko\DHL\BusinessShipment;
-use Petschko\DHL\Credentials;
-use Petschko\DHL\Receiver;
-use Petschko\DHL\Sender;
-use Petschko\DHL\SendPerson;
-use Petschko\DHL\ShipmentDetails;
-use Petschko\DHL\ShipmentOrder;
+use error08\DHL\BusinessShipment;
+use error08\DHL\Credentials;
+use error08\DHL\Receiver;
+use error08\DHL\Sender;
+use error08\DHL\SendPerson;
+use error08\DHL\ShipmentDetails;
+use error08\DHL\ShipmentOrder;
 
 class DHLBusinessCheckoutListener
 {
@@ -68,11 +68,11 @@ class DHLBusinessCheckoutListener
 
         $data = deserialize($order->shipping_data, true);
 
-        $xml = preg_replace("/(<\/?)([a-zA-Z0-9_-]+):([^>]*>)/", "$1$3", $soap);
-        $xml = simplexml_load_string($xml);
-        $json = json_encode($xml);
+        //$xml = preg_replace("/(<\/?)([a-zA-Z0-9_-]+):([^>]*>)/", "$1$3", $soap);
+        //$xml = simplexml_load_string($xml);
+        //$json = json_encode($xml);
 
-        $data['dhl_shipment_order'] =  $json;
+        //$data['dhl_shipment_order'] =  $json;
         $data['dhl_shipment_number'] = $response->getShipmentNumber();
         $data['dhl_shipment_label'] = $response->getLabel();
         $data['dhl_shipment_statusCode'] = $response->getStatusCode();
@@ -92,7 +92,7 @@ class DHLBusinessCheckoutListener
 
         $credentials->setUser($shipping->dhl_user);
         $credentials->setSignature($shipping->dhl_signature);
-        $credentials->setEpk($shipping->dhl_epk);
+        $credentials->setEkp($shipping->dhl_epk);
         $credentials->setApiUser($shipping->dhl_app);
         $credentials->setApiPassword($shipping->dhl_token);
 

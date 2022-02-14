@@ -29,7 +29,7 @@ class DHLBusiness extends Flat
      */
     public function isAvailable()
     {
-        return parent::isAvailable() && class_exists('Petschko\DHL\BusinessShipment');
+        return parent::isAvailable() && class_exists('error08\DHL\BusinessShipment');
     }
     /**
      * @inheritdoc
@@ -76,9 +76,9 @@ class DHLBusiness extends Flat
                  return;
              }
              $arrShipping = deserialize($objOrder->shipping_data, true);
-             $shipping = $order->getShippingMethod();
+             $shipping = $objOrder->getShippingMethod();
 
-             if (!$order instanceof Order
+             if (!$objOrder instanceof Order
                  || !$shipping instanceof DHLBusiness
              ) {
                  return;
@@ -94,7 +94,7 @@ class DHLBusiness extends Flat
         }
         private function getCredentials(DHLBusiness $shipping)
             {
-                    $credentials = new Credentials((bool) $shipping->debug);
+                $credentials = new Credentials((bool) $shipping->debug);
 
                 $credentials->setUser($shipping->dhl_user);
                 $credentials->setSignature($shipping->dhl_signature);

@@ -227,7 +227,7 @@ if (class_exists('Terminal42\SwissbillingApi\Client')) {
 \Isotope\Model\Shipping::registerModelType('group', 'Isotope\Model\Shipping\Group');
 \Isotope\Model\Shipping::registerModelType('product_price', 'Isotope\Model\Shipping\ProductPrice');
 
-if (class_exists('Petschko\DHL\BusinessShipment')) {
+if (class_exists('error08\DHL\BusinessShipment')) {
     \Isotope\Model\Shipping::registerModelType('dhl_business', 'Isotope\Model\Shipping\DHLBusiness');
 }
 
@@ -504,7 +504,7 @@ if (\Config::getInstance()->isComplete()) {
         $GLOBALS['TL_HOOKS']['initializeSystem'][]          = array('Isotope\BackendModule\InitializeListener', 'enableModuleTablesInSetup');
     }
 
-    if (class_exists('Petschko\DHL\BusinessShipment')) {
+    if (class_exists('error08\DHL\BusinessShipment')) {
         $GLOBALS['ISO_HOOKS']['postCheckout'][] = array('Isotope\EventListener\DHLBusinessCheckoutListener', 'onPostCheckout');
     }
 }
