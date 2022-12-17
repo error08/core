@@ -19,7 +19,7 @@ class SelectButtonsCallbackListener
 
             \System::log('POST: '.print_r($_POST,1), __METHOD__, TL_GENERAL);
             \System::log('GET: '.print_r($_GET,1), __METHOD__, TL_GENERAL);
-            \System::log('DC: '.print_r($dc->idÓ,1), __METHOD__, TL_GENERAL);
+            \System::log('DC: '.print_r($dc->id,1), __METHOD__, TL_GENERAL);
             $orders = Order::findMultipleByIds($_POST['IDS']);
             if (count($orders) == 0) {
                 \Message::addError('Could not find orders for ids.');
